@@ -9,7 +9,9 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  IconButton
+  IconButton,
+  FormControlLabel,
+  Switch
 } from '@material-ui/core'
 
 import {Add} from '@material-ui/icons';
@@ -45,7 +47,12 @@ export function AddPrinter(props) {
           </IconButton>
         </h2>
 
-        <Dialog fullWidth maxWidth='sm' open={openAdd} onClose={() => setOpenAdd(false)}>
+        <Dialog 
+          fullWidth 
+          maxWidth='sm' 
+          open={openAdd} 
+          onClose={() => setOpenAdd(false)}
+        >
           <DialogTitle>Add Printer</DialogTitle>
           <DialogContent>
             <TextField 
@@ -54,25 +61,32 @@ export function AddPrinter(props) {
               onChange={e => setName(e.target.value)} 
               label='Name'
             />
-            <br/>
+            <br/><br/>
             <TextField 
               fullWidth
               value={ipAddress} 
               onChange={e => setIpAddress(e.target.value)} 
               label='IP Address'
             />
-            <br/>
-            <a
-              onClick={() => {
-                if (status === "ACTIVE") {
-                  setStatus("INACTIVE")
-                } else {
-                  setStatus("ACTIVE")
-                }
-              }}
-            >
-              {status}
-            </a>
+            <br/><br/>
+
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={status === 'ACTIVE'}
+                  onChange={() => {
+                    if (status === 'ACTIVE') {
+                      setStatus('INACTIVE')
+                    } else {
+                      setStatus('ACTIVE')
+                    }
+                  }}
+                  value={status}
+                  color="primary"
+                />
+              }
+              label={status}
+            />
 
           </DialogContent>
           <DialogActions>
@@ -80,7 +94,8 @@ export function AddPrinter(props) {
               Cancel
             </Button>
             <Button 
-              variant='contained' 
+              variant='contained'
+              color='primary'
               disabled={loading || !name || !ipAddress} 
               onClick={() => {
                 addPrinter({ variables: {name, ipAddress, status} })

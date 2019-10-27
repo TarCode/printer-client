@@ -66,12 +66,15 @@ export function Printers() {
       {
             toDelete &&
             <Dialog
+                fullWidth
+                maxWidth='sm'
                 open={toDelete ? true : false}
                 onClose={() => setToDelete(null)}
             >
                 <DialogTitle>Delete {toDelete.name}</DialogTitle>
                 <DialogContent>
                     Are you sure you want to delete {toDelete.name}?
+                    <br/><br/>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setToDelete(null)}>
@@ -80,6 +83,7 @@ export function Printers() {
                     <Button
                         disabled={delProps.loading}
                         variant="contained"
+                        color='primary'
                         onClick={() => {
                             deletePrinter({ variables: { id: toDelete.id } })
                             .then(res => {
