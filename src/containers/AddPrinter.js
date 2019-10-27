@@ -8,8 +8,11 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  IconButton
 } from '@material-ui/core'
+
+import {Add} from '@material-ui/icons';
 
 const ADD_PRINTER = gql`
     mutation AddPrinter($name: String!, $ipAddress: String!, $status: StatusType!) {
@@ -22,7 +25,7 @@ const ADD_PRINTER = gql`
 }`
 
 export function AddPrinter(props) {
-  const [addPrinter, { data, loading, error }] = useMutation(ADD_PRINTER);
+  const [addPrinter, { loading, error }] = useMutation(ADD_PRINTER);
 
   const [name, setName] = useState("");
   const [ipAddress, setIpAddress] = useState("");
@@ -35,7 +38,12 @@ export function AddPrinter(props) {
 
   return ( 
     <div>
-        <Button onClick={() => setOpenAdd(true)}>Add Printer</Button>
+        <h2>
+          Printers
+          <IconButton onClick={() => setOpenAdd(true)}>
+            <Add/>
+          </IconButton>
+        </h2>
 
         <Dialog fullWidth maxWidth='sm' open={openAdd} onClose={() => setOpenAdd(false)}>
           <DialogTitle>Add Printer</DialogTitle>
@@ -71,7 +79,10 @@ export function AddPrinter(props) {
             <Button onClick={() => setOpenAdd(false)}>
               Cancel
             </Button>
-            <Button variant='contained' disabled={loading || !name || !ipAddress} onClick={() => {
+            <Button 
+              variant='contained' 
+              disabled={loading || !name || !ipAddress} 
+              onClick={() => {
                 addPrinter({ variables: {name, ipAddress, status} })
                 .then(() => {
                   setName("");
