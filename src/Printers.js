@@ -1,44 +1,41 @@
 import React from 'react';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
+import { AddPrinter } from './AddPrinter'
 
 const PRINTERS = gql`
-    query GetPrinters { printers {id,name,ipAddress} }
+    query GetPrinters { printers {id,name,ipAddress, status} }
 `;
-
-const ADD_PRINTER = gql`
-    mutation AddPrinter($name: String!, $ipAddress: String!, $status: String!) {
-    addPrinter(name: $name, ipAddress: $ipAddress, status: $status) {
-        id
-        name
-        ipAddress
-        status
-    }
-}`
 
 const DELETE_PRINTER = gql`
   mutation DeletePrinter($id: String!) {
     removePrinter(id: $id) {
-        bool
+        message
     }
   }
 `;
 
 export function Printers() {
-  const { loading, error, data } = useQuery(PRINTERS);
-  const [deletePrinter, deletePrinterRes] = useMutation(DELETE_PRINTER);
+  const { loading, error, data, refetch } = useQuery(PRINTERS);
+  const [deletePrinter] = useMutation(DELETE_PRINTER);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error :(</p>;
 
-  return data.printers.map(({ id, name, ipAddress }) => (
-    <div key={name}>
-      <p>
-        {name}: {ipAddress}
-      </p>
-      <button onClick={() => {
-          deletePrinter({ variables: { id } });
-      }}>Delete</button>
-    </div>
-  ));
+  return <div>
+      <AddPrinter refetch={refetch}/>
+      {
+        data.printers.map(({ id, name, ipAddress, status }) => (
+            <div key={name}>
+            <p>
+                {name}: {ipAddress} - {status}
+            </p>
+            <button onClick={() => {
+                deletePrinter({ variables: { id } })
+                .then(res => { refetch();})
+            }}>Delete</button>
+            </div>
+        ))
+      }
+  </div>
 }

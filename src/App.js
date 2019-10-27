@@ -2,7 +2,6 @@ import React from 'react';
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from '@apollo/react-hooks';
 import { Printers } from './Printers'
-
 import './App.css';
 
 const client = new ApolloClient({
@@ -14,7 +13,7 @@ function App() {
   return (
     <ApolloProvider client={client}>
       <div>
-        <h2>My first Apollo app 🚀</h2>
+        <h2>Printeroo</h2>
         <Printers/>
       </div>
     </ApolloProvider>
