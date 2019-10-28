@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 import { AddPrinter } from './AddPrinter'
+import { UpdatePrinter } from './UpdatePrinter';
 
 import {
     ListItem,
@@ -19,7 +20,8 @@ import {
 } from '@material-ui/core';
 
 import {
-    Delete
+    Delete,
+    Edit
 } from '@material-ui/icons'
 
 const PRINTERS = gql`
@@ -38,6 +40,7 @@ export function Printers() {
   const { loading, error, data, refetch } = useQuery(PRINTERS);
   const [deletePrinter, delProps] = useMutation(DELETE_PRINTER);
   const [toDelete, setToDelete] = useState(null);
+  const [toUpdate, setToUpdate] = useState(null);
 
   if (loading) return (
     <Container style={{ textAlign: 'center', marginTop: '40vh' }}>
@@ -58,10 +61,19 @@ export function Printers() {
                     secondary={ipAddress}
                 />
                 <ListItemIcon>
-                    <Chip label={status} variant="contained" style={{
+                    <Chip label={status} variant="default" style={{
                         backgroundColor: status === 'ACTIVE' ? 'green' : 'red',
                         color: '#ffffff'
                     }} />
+                </ListItemIcon>
+                <ListItemIcon>
+                    <IconButton
+                        onClick={() => {
+                            setToUpdate({id, name, ipAddress, status})
+                        }}
+                    >
+                        <Edit/>
+                    </IconButton>
                 </ListItemIcon>
                 <ListItemIcon>
                     <IconButton
@@ -75,6 +87,8 @@ export function Printers() {
             </ListItem>
         ))
       }
+
+      {toUpdate && <UpdatePrinter toUpdate={toUpdate} setToUpdate={setToUpdate}/>}
 
       {
             toDelete &&
