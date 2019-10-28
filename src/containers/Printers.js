@@ -14,7 +14,8 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
-    Button
+    Button,
+    Chip
 } from '@material-ui/core';
 
 import {
@@ -38,18 +39,30 @@ export function Printers() {
   const [deletePrinter, delProps] = useMutation(DELETE_PRINTER);
   const [toDelete, setToDelete] = useState(null);
 
-  if (loading) return <Container style={{ textAlign: 'center', marginTop: '40vh' }}><CircularProgress/></Container>;
+  if (loading) return (
+    <Container style={{ textAlign: 'center', marginTop: '40vh' }}>
+        <CircularProgress/>
+    </Container>
+  );
+
   if (error) return <p>Error :(</p>;
 
   return <Container>
       <AddPrinter refetch={refetch}/>
+      <p>Welcome to the printer management dashboard</p>
       {
         data.printers.map(({ id, name, ipAddress, status }) => (
             <ListItem key={name}>
                 <ListItemText
-                    primary={name + ' - ' + status}
+                    primary={name.toUpperCase()}
                     secondary={ipAddress}
                 />
+                <ListItemIcon>
+                    <Chip label={status} variant="contained" style={{
+                        backgroundColor: status === 'ACTIVE' ? 'green' : 'red',
+                        color: '#ffffff'
+                    }} />
+                </ListItemIcon>
                 <ListItemIcon>
                     <IconButton
                         onClick={() => {
