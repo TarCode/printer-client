@@ -16,6 +16,8 @@ import {
 
 import {Add} from '@material-ui/icons';
 
+import { validateIPaddress } from '../utils'
+
 const ADD_PRINTER = gql`
     mutation AddPrinter($name: String!, $ipAddress: String!, $status: StatusType!) {
     addPrinter(name: $name, ipAddress: $ipAddress, status: $status) {
@@ -34,6 +36,8 @@ export function AddPrinter(props) {
   const [status, setStatus] = useState("ACTIVE");
 
   const [openAdd, setOpenAdd] = useState(false);
+
+  const ipIsValid = validateIPaddress(ipAddress);
 
 
   if (error) return <p>Error :(</p>;
@@ -68,7 +72,13 @@ export function AddPrinter(props) {
               onChange={e => setIpAddress(e.target.value)} 
               label='IP Address'
             />
-            <br/><br/>
+            <br/>
+              {
+                ipAddress.length > 0 && !ipIsValid ?
+                <p style={{ color: 'red'}}>Please enter a valid IP address</p> :
+                null
+              }
+            <br/>
 
             <FormControlLabel
               control={
@@ -96,7 +106,12 @@ export function AddPrinter(props) {
             <Button 
               variant='contained'
               color='primary'
-              disabled={loading || !name || !ipAddress} 
+              disabled={
+                loading || 
+                !name || 
+                !ipAddress ||
+                (ipAddress.length > 0 && !ipIsValid)
+              } 
               onClick={() => {
                 addPrinter({ variables: {name, ipAddress, status} })
                 .then(() => {
