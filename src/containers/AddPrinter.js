@@ -19,21 +19,21 @@ import {Add} from '@material-ui/icons';
 import { validateIPaddress } from '../utils'
 
 const ADD_PRINTER = gql`
-    mutation AddPrinter($name: String!, $ipAddress: String!, $status: StatusType!) {
-    addPrinter(name: $name, ipAddress: $ipAddress, status: $status) {
+    mutation AddPrinter($printerName: String!, $ipAddress: String!, $printerStatus: StatusType!) {
+    addPrinter(printerName: $printerName, ipAddress: $ipAddress, printerStatus: $printerStatus) {
         id
-        name
+        printerName
         ipAddress
-        status
+        printerStatus
     }
 }`
 
 export function AddPrinter(props) {
   const [addPrinter, { loading, error }] = useMutation(ADD_PRINTER);
 
-  const [name, setName] = useState("");
+  const [printerName, setPrinterName] = useState("");
   const [ipAddress, setIpAddress] = useState("");
-  const [status, setStatus] = useState("ACTIVE");
+  const [printerStatus, setPrinterStatus] = useState("ACTIVE");
 
   const [openAdd, setOpenAdd] = useState(false);
 
@@ -61,8 +61,8 @@ export function AddPrinter(props) {
           <DialogContent>
             <TextField 
               fullWidth
-              value={name} 
-              onChange={e => setName(e.target.value)} 
+              value={printerName} 
+              onChange={e => setPrinterName(e.target.value)} 
               label='Name'
             />
             <br/><br/>
@@ -83,19 +83,19 @@ export function AddPrinter(props) {
             <FormControlLabel
               control={
                 <Switch
-                  checked={status === 'ACTIVE'}
+                  checked={printerStatus === 'ACTIVE'}
                   onChange={() => {
-                    if (status === 'ACTIVE') {
-                      setStatus('INACTIVE')
+                    if (printerStatus === 'ACTIVE') {
+                      setPrinterStatus('INACTIVE')
                     } else {
-                      setStatus('ACTIVE')
+                      setPrinterStatus('ACTIVE')
                     }
                   }}
-                  value={status}
+                  value={printerStatus}
                   color="primary"
                 />
               }
-              label={status}
+              label={printerStatus}
             />
 
           </DialogContent>
@@ -108,14 +108,14 @@ export function AddPrinter(props) {
               color='primary'
               disabled={
                 loading || 
-                !name || 
+                !printerName || 
                 !ipAddress ||
                 (ipAddress.length > 0 && !ipIsValid)
               } 
               onClick={() => {
-                addPrinter({ variables: {name, ipAddress, status} })
+                addPrinter({ variables: {printerName, ipAddress, printerStatus} })
                 .then(() => {
-                  setName("");
+                  setPrinterName("");
                   setIpAddress("");
                   props.refetch();
                   setOpenAdd(false);

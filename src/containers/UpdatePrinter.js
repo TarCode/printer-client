@@ -17,29 +17,26 @@ import {
 import { validateIPaddress } from '../utils'
 
 const UPDATE_PRINTER = gql`
-    mutation UpdatePrinter($id: String!, $name: String!, $ipAddress: String!, $status: StatusType!) {
-    updatePrinter(id: $id, name: $name, ipAddress: $ipAddress, status: $status) {
+    mutation UpdatePrinter($id: String!, $printerName: String!, $ipAddress: String!, $printerStatus: StatusType!) {
+    updatePrinter(id: $id, printerName: $printerName, ipAddress: $ipAddress, printerStatus: $printerStatus) {
         id
-        name
-        ipAddress
-        status
     }
 }`
 
 export function UpdatePrinter(props) {
   const [updatePrinter, { loading, error }] = useMutation(UPDATE_PRINTER);
 
-  const [name, setName] = useState("");
+  const [printerName, setPrinterName] = useState("");
   const [ipAddress, setIpAddress] = useState("");
-  const [status, setStatus] = useState("ACTIVE");
+  const [printerStatus, setPrinterStatus] = useState("ACTIVE");
 
   const { toUpdate, setToUpdate } = props;
 
   useEffect(() => {
-    setName(props.toUpdate.name);
+    setPrinterName(props.toUpdate.printerName);
     setIpAddress(props.toUpdate.ipAddress);
-    setStatus(props.toUpdate.status);
-  }, [props.toUpdate.name, props.toUpdate.ipAddress, props.toUpdate.status]);
+    setPrinterStatus(props.toUpdate.printerStatus);
+  }, [props.toUpdate.printerName, props.toUpdate.ipAddress, props.toUpdate.printerStatus]);
 
   const ipIsValid = validateIPaddress(ipAddress);
 
@@ -54,12 +51,12 @@ export function UpdatePrinter(props) {
           open={toUpdate ? true : false} 
           onClose={() => setToUpdate(null)}
         >
-          <DialogTitle>Update Printer {toUpdate.name}</DialogTitle>
+          <DialogTitle>Update Printer {toUpdate.printerName}</DialogTitle>
           <DialogContent>
             <TextField 
               fullWidth
-              value={name} 
-              onChange={e => setName(e.target.value)} 
+              value={printerName} 
+              onChange={e => setPrinterName(e.target.value)} 
               label='Name'
             />
             <br/><br/>
@@ -80,19 +77,19 @@ export function UpdatePrinter(props) {
             <FormControlLabel
               control={
                 <Switch
-                  checked={status === 'ACTIVE'}
+                  checked={printerStatus === 'ACTIVE'}
                   onChange={() => {
-                    if (status === 'ACTIVE') {
-                      setStatus('INACTIVE')
+                    if (printerStatus === 'ACTIVE') {
+                      setPrinterStatus('INACTIVE')
                     } else {
-                      setStatus('ACTIVE')
+                      setPrinterStatus('ACTIVE')
                     }
                   }}
-                  value={status}
+                  value={printerStatus}
                   color="primary"
                 />
               }
-              label={status}
+              label={printerStatus}
             />
 
           </DialogContent>
@@ -105,14 +102,14 @@ export function UpdatePrinter(props) {
               color='primary'
               disabled={
                 loading || 
-                !name || 
+                !printerName || 
                 !ipAddress ||
                 (ipAddress.length > 0 && !ipIsValid)
               } 
               onClick={() => {
-                updatePrinter({ variables: {id: props.toUpdate.id, name, ipAddress, status} })
+                updatePrinter({ variables: {id: props.toUpdate.id, printerName, ipAddress, printerStatus} })
                 .then(() => {
-                  setName("");
+                  setPrinterName("");
                   setIpAddress("");
                   props.refetch();
                   setToUpdate(null);

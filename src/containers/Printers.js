@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 import { AddPrinter } from './AddPrinter'
 import { UpdatePrinter } from './UpdatePrinter';
+import { DeletePrinter } from './DeletePrinter';
 
 import {
     ListItem,
@@ -11,11 +12,6 @@ import {
     IconButton,
     Container,
     CircularProgress,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Button,
     Chip
 } from '@material-ui/core';
 
@@ -25,20 +21,11 @@ import {
 } from '@material-ui/icons'
 
 const PRINTERS = gql`
-    query GetPrinters { printers {id,name,ipAddress, status} }
-`;
-
-const DELETE_PRINTER = gql`
-  mutation DeletePrinter($id: String!) {
-    removePrinter(id: $id) {
-        message
-    }
-  }
+    query GetPrinters { printers {id,printerName,ipAddress, printerStatus} }
 `;
 
 export function Printers() {
   const { loading, error, data, refetch } = useQuery(PRINTERS);
-  const [deletePrinter, delProps] = useMutation(DELETE_PRINTER);
   const [toDelete, setToDelete] = useState(null);
   const [toUpdate, setToUpdate] = useState(null);
 
@@ -54,22 +41,22 @@ export function Printers() {
       <AddPrinter refetch={refetch}/>
       <p>Welcome to the printer management dashboard</p>
       {
-        data.printers.map(({ id, name, ipAddress, status }) => (
-            <ListItem key={name}>
+        data.printers.map(({ id, printerName, ipAddress, printerStatus }) => (
+            <ListItem key={printerName}>
                 <ListItemText
-                    primary={name.toUpperCase()}
+                    primary={printerName.toUpperCase()}
                     secondary={ipAddress}
                 />
                 <ListItemIcon>
-                    <Chip label={status} variant="default" style={{
-                        backgroundColor: status === 'ACTIVE' ? 'green' : 'red',
+                    <Chip label={printerStatus} variant="default" style={{
+                        backgroundColor: printerStatus === 'ACTIVE' ? 'green' : 'red',
                         color: '#ffffff'
                     }} />
                 </ListItemIcon>
                 <ListItemIcon>
                     <IconButton
                         onClick={() => {
-                            setToUpdate({id, name, ipAddress, status})
+                            setToUpdate({id, printerName, ipAddress, printerStatus})
                         }}
                     >
                         <Edit/>
@@ -78,7 +65,7 @@ export function Printers() {
                 <ListItemIcon>
                     <IconButton
                         onClick={() => {
-                            setToDelete({id, name})
+                            setToDelete({id, printerName})
                         }}
                     >
                         <Delete/>
@@ -88,45 +75,8 @@ export function Printers() {
         ))
       }
 
-      {toUpdate && <UpdatePrinter toUpdate={toUpdate} setToUpdate={setToUpdate}/>}
+      {toUpdate && <UpdatePrinter toUpdate={toUpdate} setToUpdate={setToUpdate} refetch={refetch}/>}
 
-      {
-            toDelete &&
-            <Dialog
-                fullWidth
-                maxWidth='sm'
-                open={toDelete ? true : false}
-                onClose={() => setToDelete(null)}
-            >
-                <DialogTitle>Delete {toDelete.name}</DialogTitle>
-                <DialogContent>
-                    Are you sure you want to delete {toDelete.name}?
-                    <br/><br/>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setToDelete(null)}>
-                        No
-                    </Button>
-                    <Button
-                        disabled={delProps.loading}
-                        variant="contained"
-                        color='primary'
-                        onClick={() => {
-                            deletePrinter({ variables: { id: toDelete.id } })
-                            .then(res => {
-                                refetch();
-                                setToDelete(null);
-                            })
-                        }}
-                    >
-                        {
-                            delProps.loading ?
-                            "Deleting..." :
-                            "Yes"
-                        }
-                    </Button>
-                </DialogActions>
-            </Dialog>
-      }
+      {toDelete && <DeletePrinter toDelete={toDelete} setToDelete={setToDelete} refetch={refetch}/>}
   </Container>
 }
